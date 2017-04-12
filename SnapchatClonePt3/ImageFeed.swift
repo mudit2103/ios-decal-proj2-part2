@@ -60,7 +60,27 @@ func addPost(postImage: UIImage, thread: String, username: String) {
     let data = UIImageJPEGRepresentation(postImage, 1.0)! 
     let path = "\(firStorageImagesPath)/\(UUID().uuidString)"
     
-    // YOUR CODE HERE
+    var dict = [String: String]()
+    
+    let date = Date()
+    let formatter = DateFormatter()
+    formatter.dateFormat = dateFormat
+    let result = formatter.string(from: date)
+    
+    dict[firDateNode] = result
+    dict[firImagePathNode] = path
+    dict[firUsernameNode] = username
+    dict[firThreadNode] = thread
+    
+    
+    
+    dbRef.child(firPostsNode).childByAutoId().setValue(dict)
+    
+    
+    store(data: data, toPath: path)
+    
+    
+    
 }
 
 /*
@@ -73,8 +93,11 @@ func addPost(postImage: UIImage, thread: String, username: String) {
 */
 func store(data: Data, toPath path: String) {
     let storageRef = FIRStorage.storage().reference()
-    
-    // YOUR CODE HERE
+    storageRef.child(path).put(data, metadata: nil) {(metadata, error) in
+        if let error = error {
+            print(error.localizedDescription)
+        }
+    }
 }
 
 
@@ -99,7 +122,29 @@ func getPosts(user: CurrentUser, completion: @escaping ([Post]?) -> Void) {
     let dbRef = FIRDatabase.database().reference()
     var postArray: [Post] = []
     
-    // YOUR CODE HERE
+    dbRef.child(firPostsNode).observeSingleEvent(of: .value, with: { (snapshot) in
+        if snapshot.exists() {
+            let snapshotvalue = snapshot.value as? [String:AnyObject]
+            user.getReadPostIDs(completion: { (readposts) in
+                for (key, v) in snapshotvalue! {
+                    let value = v as! [String: String]
+                    
+                    let isRead = readposts.contains(key)
+                    
+                    let post = Post(id: key, username: value[firUsernameNode]!, postImagePath: value[firImagePathNode]!, thread: value[firThreadNode]!, dateString: value[firDateNode]!, read: isRead)
+                    
+                    postArray.append(post)
+                    
+                    
+                    
+                }
+                completion(postArray)
+            })
+        } else {
+//            Snapshot does not exist
+            completion(nil)
+        }
+    })
 }
 
 func getDataFromPath(path: String, completion: @escaping (Data?) -> Void) {
