@@ -79,8 +79,11 @@ class PostsTableViewController: UIViewController, UITableViewDelegate, UITableVi
             for post in postreturned! {
                 addPostToThread(post: post)
                 getDataFromPath(path: post.postImagePath, completion: { (data) in
-                    let image = UIImage(data: data!)
-                    self.loadedImagesById[post.postId] = image
+                    if let data = data {
+                        let image = UIImage(data: data)
+                        self.loadedImagesById[post.postId] = image
+                    }
+                    
                 })
             }
             
@@ -117,6 +120,9 @@ class PostsTableViewController: UIViewController, UITableViewDelegate, UITableVi
                     // hide the navigation and tab bar for presentation
                     self.navigationController?.navigationBar.isHidden = true
                     self.tabBarController?.tabBar.isHidden = true
+                } else {
+                    MBProgressHUD.hide(for: self.view, animated: true)
+                    
                 }
             })
         }
