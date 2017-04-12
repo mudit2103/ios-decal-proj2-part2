@@ -126,8 +126,8 @@ func getPosts(user: CurrentUser, completion: @escaping ([Post]?) -> Void) {
         if snapshot.exists() {
             let snapshotvalue = snapshot.value as? [String:AnyObject]
             user.getReadPostIDs(completion: { (readposts) in
-                for (key, v) in snapshotvalue! {
-                    let value = v as! [String: String]
+                for key in (snapshotvalue?.keys)! {
+                    let value = snapshotvalue?[key] as! [String: String]
                     
                     let isRead = readposts.contains(key)
                     
@@ -135,8 +135,7 @@ func getPosts(user: CurrentUser, completion: @escaping ([Post]?) -> Void) {
                     
                     postArray.append(post)
                     
-                    
-                    
+                
                 }
                 completion(postArray)
             })

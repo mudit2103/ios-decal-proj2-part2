@@ -37,12 +37,20 @@ class CurrentUser {
             if snapshot.exists() {
                 let snapshotdict = snapshot.value as? [String: AnyObject]
                 
-                for (_, value) in snapshotdict! {
-                    postArray.append(value as! String)
+                if snapshotdict == nil {
+                    completion(postArray)
+                }
+                else {
+                    for (_, value) in snapshotdict! {
+                        postArray.append(value as! String)
+                    }
+                    completion(postArray)
                 }
                 
+            
+            }
+            else {
                 completion(postArray)
-                
             }
             
         })

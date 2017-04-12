@@ -22,7 +22,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     override func viewDidAppear(_ animated: Bool) {
         // Checks if user is already signed in and skips login
         if FIRAuth.auth()?.currentUser != nil {
-            self.performSegue(withIdentifier: "loginToMain", sender: self)
+           self.performSegue(withIdentifier: "loginToMain", sender: self)
         }
     }
     override func didReceiveMemoryWarning() {
